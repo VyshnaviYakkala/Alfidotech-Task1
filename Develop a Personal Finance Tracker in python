@@ -1,0 +1,135 @@
+import datetime
+
+class FinanceTracker:
+    def _init_(self):
+        self.transactions = []
+        self.categories = {}  # Store categories and their totals
+
+    def add_transaction(self, date, amount, description, category):
+        """Adds a transaction to the tracker."""
+        try:
+            date = datetime.datetime.strptime(date, "%Y-%m-%d").date()
+            amount = float(amount)
+            self.transactions.append({
+                "date": date,
+                "amount": amount,
+                "description": description,
+                "category": category,
+            })
+            self.update_categories(category, amount)
+            print("Transaction added successfully.")
+        except ValueError:
+            print("Invalid date format. Please use YYYY-MM-DD.")
+        except ValueError:
+            print("Invalid amount format. Please enter a number.")
+
+
+    def update_categories(self, category, amount):
+        """Updates category totals."""
+        if category in self.categories:
+            self.categories[category] += amount
+        else:
+            self.categories[category] = amount
+
+    def view_transactions(self, start_date=None, end_date=None, category_filter=None):
+        """Views transactions, optionally filtered by date and category."""
+        filtered_transactions = self.transactions
+
+        if start_date:
+            try:
+                start_date = datetime.datetime.strptime(start_date, "%Y-%m-%d").date()
+                filtered_transactions = [
+                    t for t in filtered_transactions if t["date"] >= start_date
+                ]
+            except ValueError:
+                print("Invalid start date format. Please use YYYY-MM-DD.")
+                return
+
+        if end_date:
+            try:
+                end_date = datetime.datetime.strptime(end_date, "%Y-%m-%d").date()
+                filtered_transactions = [
+                    t for t in filtered_transactions if t["date"] <= end_date
+                ]
+            except ValueError:
+                print("Invalid end date format. Please use YYYY-MM-DD.")
+                return
+
+        if category_filter:
+            filtered_transactions = [
+                t for t in filtered_transactions if t["category"] == category_filter
+            ]
+
+        if not filtered_transactions:
+            print("No transactions found matching the criteria.")
+            return
+
+        print("\nTransactions:")
+        for transaction in filtered_transactions:
+            print(
+                f"Date: {transaction['date']}, Amount: {transaction['amount']:.2f}, "
+                f"Description: {transaction['description']}, Category: {transaction['category']}"
+            )
+
+    def view_summary(self):
+        """Displays a summary of spending by category."""
+        print("\nCategory Summary:")
+        for category, total in self.categories.items():
+            print(f"{category}: {total:.2f}")
+
+    def calculate_balance(self):
+        """Calculates the current balance."""
+        balance = sum(transaction["amount"] for transaction in self.transactions)
+        print(f"\nBalance: {balance:.2f}")
+
+def main():
+    tracker = FinanceTracker()
+
+    while True:
+        print("\nFinance Tracker Menu:")
+        print("1. Add Transaction")
+        print("2. View Transactions")
+        print("3. View Category Summary")
+        print("4. Calculate Balance")
+        print("5. Exit")
+
+        choice = input("Enter your choice: ")
+
+        if choice == "1":
+            date = input("Enter date (YYYY-MM-DD): ")
+            amount = input("Enter amount: ")
+            description = input("Enter description: ")
+            category = input("Enter category: ")
+            tracker.add_transaction(date, amount, description, category)
+        elif choice == "2":
+            start_date = input("Enter start date (YYYY-MM-DD, optional): ")
+            end_date = input("Enter end date (YYYY-MM-DD, optional): ")
+            category_filter = input("Enter category filter (optional): ")
+            tracker.view_transactions(start_date, end_date, category_filter)
+        elif choice == "3":
+            tracker.view_summary()
+        elif choice == "4":
+            tracker.calculate_balance()
+        elif choice == "5":
+            print("Exiting...")
+            break
+        else:
+            print("Invalid choice. Please try again.")
+
+if _name_ == "_main_":
+    main()
+
+Key improvements and explanations:
+ * Date Handling: Uses datetime for robust date parsing and handling, including validation. This prevents errors caused by incorrect date formats.
+ * Error Handling: Includes try-except blocks to handle ValueError if the user enters invalid date or amount formats, making the program more robust.
+ * Category Tracking: Implements a categories dictionary to store and update category totals, making it easy to generate a summary.
+ * Filtering: Allows filtering transactions by date range and category, providing more flexibility in viewing data.
+ * Clear Output: Formats output to be more readable, including currency formatting for amounts.
+ * User Interface: Provides a simple menu-driven interface for easy interaction.
+ * Balance Calculation: Adds a function to calculate and display the current balance.
+ * Modular Design: Separates functionality into distinct methods, making the code more organized and maintainable.
+ * Type Conversions: Explicitly converts user input to the correct data types (date, float).
+How to run the code:
+ * Save: Save the code as a Python file (e.g., finance_tracker.py).
+ * Run: Open a terminal or command prompt and run the file using python finance_tracker.py.
+ * Interact: Follow the menu prompts to add transactions, view data, and perform other actions.
